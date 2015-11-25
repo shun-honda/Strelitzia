@@ -9,6 +9,10 @@ module Strelitzia
       return @expr
     end
 
+    def name
+      return @name
+    end
+
     def to_s
       return @name + ' = ' + @expr.to_s
     end
@@ -72,8 +76,17 @@ module Strelitzia
   end
 
   class Str < Expression
-    def initialize(str)
+    def initialize(str, id)
       @str = str
+      @id = id
+    end
+
+    def str
+      return @str
+    end
+
+    def id
+      return @id
     end
 
     def accept(visitor)
@@ -88,6 +101,10 @@ module Strelitzia
   class NonTerminal < Expression
     def initialize(name)
       @name = name
+    end
+
+    def name
+      return @name
     end
 
     def accept(visitor)

@@ -14,10 +14,10 @@ module Strelitzia
     end
 
     def parseStrelizia
-      p @inputs
-      p @tokens
+      # print "inputs: \n" + @inputs
+      print "tokens: " + @tokens.to_s + "\n"
       size = @tokens.length
-      g = Grammar.new()
+      @g = Grammar.new()
       @pos = 0
       while @pos < size
         token = @tokens[@pos]
@@ -29,7 +29,7 @@ module Strelitzia
             expr = pOr
             if expr != nil
               prod = Production.new(name, expr)
-              g.addProduction(prod)
+              @g.addProduction(prod)
             else
               raise "syntax error"
             end
@@ -38,7 +38,7 @@ module Strelitzia
           end
         end
       end
-      return g
+      return @g
     end
 
     def pOr
@@ -90,7 +90,8 @@ module Strelitzia
       token = @tokens[@pos]
       if /^'([^'\n\r]*)'$/ =~ token
         @pos += 1
-        return Str.new($1)
+        id = @g.addSymBol($1)
+        return Str.new($1, id)
       elsif /^([_a-zA-Z][_a-zA-Z0-9]*)$/ =~ token
         @pos += 1
         return NonTerminal.new($1)
@@ -106,10 +107,20 @@ module Strelitzia
   class Grammar
     def initialize
       @production_list = []
+      @symbol_list = []
     end
 
     def addProduction(prod)
       @production_list << prod
+    end
+
+    def addSymBol(symbol)
+      if @symbol_list.include?(symbol)
+        return @symbol_list.index(symbol)
+      end
+      id = @symbol_list.length
+      @symbol_list << symbol
+      return id
     end
 
     def getProductionList
@@ -118,6 +129,7 @@ module Strelitzia
 
     def to_s
       str = ""
+      str += "symbol_list: " + @symbol_list.to_s + "\n"
       @production_list.each { |prod| str += prod.to_s + "\n" }
       return str
     end
